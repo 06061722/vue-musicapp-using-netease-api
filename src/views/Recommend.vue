@@ -1,37 +1,65 @@
 <template>
   <div class="recommend" ref="recommend">
-    <div class="recommend-content">
-      <div class="slider-wrapper">
-        <slider :banners="banners"></slider>
+    <scroll ref="scroll" class="recommend-content" :data="playList">
+      <div>
+        <div class="slider-wrapper">
+          <slider :banners="banners" @onImgLoaded="_onImgLoaded"></slider>
+        </div>
+        <div class="recommend-list">
+          <h1 class="list-title">热门歌单推荐</h1>
+          <ul>
+            <li class="item" v-for="(item, index) in playList" :key="index">
+              <div class="icon">
+                <img width="60" height="60" v-lazy="item.coverImgUrl" alt>
+              </div>
+              <div class="text">
+                <h2 class="name">{{ item.creator.nickname }}</h2>
+                <p class="desc">{{ item.name }}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="recommend-list">
-        <h1 class="list-title">热门歌单推荐</h1>
-        <ul></ul>
+      <div class="loading-container" v-show="!playList.length">
+        <loading></loading>
       </div>
-    </div>
+    </scroll>
   </div>
 </template>
 <script>
-import { getRecommend } from '@/api/recommend'
+import { getRecommend, getPlayList } from '@/api/recommend'
 import Slider from '_c/slider/slider'
+import Scroll from '_c/scroll/scroll'
+import Loading from '_c/loading/loading'
 export default {
   components: {
-    Slider
+    Slider,
+    Scroll,
+    Loading
   },
   data () {
     return {
-      banners: []
+      banners: [],
+      playList: []
     }
   },
   methods: {
     filterBanners (banners) {
-      return banners.filter(item => item.targetType === 10)
+      return banners.filter(item => item.targetType === 1 || item.targetType === 10)
     },
     _getRecommend () {
       getRecommend().then(res => {
+        if (!res === 200) return
         const filteredBanners = this.filterBanners(res.banners)
         this.banners = filteredBanners
       })
+      getPlayList().then(res => {
+        if (!res === 200) return
+        this.playList = res.playlists
+      })
+    },
+    _onImgLoaded () {
+      this.$refs.scroll._refresh()
     }
   },
   created () {

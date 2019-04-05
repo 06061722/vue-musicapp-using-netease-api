@@ -3,7 +3,7 @@
     <div class="slider-group" ref="sliderGroup">
       <div class="slider-item" ref="slideritem" v-for="(item, index) in banners" :key="index">
         <a href="#">
-          <img :src="item.imageUrl">
+          <img @load="_onImgLoaded" :src="item.imageUrl">
         </a>
       </div>
     </div>
@@ -78,6 +78,12 @@ export default {
       this.timer = setTimeout(() => {
         this.slider.next()
       }, this.interval)
+    },
+    _onImgLoaded () {
+      if (!this.checkImgLoaded) {
+        this.$emit('onImgLoaded')
+        this.checkImgLoaded = true
+      }
     }
   },
   watch: {
@@ -96,9 +102,6 @@ export default {
       this._initSlider()
       if (this.autoPlay) this._play()
     })
-  },
-  destroyed () {
-    console.log(233)
   }
 }
 </script>
