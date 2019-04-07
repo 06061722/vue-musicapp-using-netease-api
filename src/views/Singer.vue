@@ -1,16 +1,20 @@
 <template>
   <div class="singer" ref="singer">
-    <router-view></router-view>
+    <list-view :data="singers"></list-view>
   </div>
 </template>
 <script>
 import { getSingerList } from '@/api/singer'
 import { Singer } from '@/lib/utils'
+import ListView from '_c/listview/listview'
 const pinyin = require('pinyin')
 
 const HOT_NAME = '热门'
 const HOT_SINGER_LEN = 10
 export default {
+  components: {
+    ListView
+  },
   data () {
     return {
       singers: []
@@ -21,7 +25,6 @@ export default {
       getSingerList().then(res => {
         if (!res.code === 200) return
         this.singers = this._normalizeSingerList(res.artists)
-        console.log(this.singers)
       })
     },
     _normalizeSingerList (artists) {

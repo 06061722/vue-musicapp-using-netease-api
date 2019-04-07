@@ -19,11 +19,14 @@ export default {
     data: {
       type: Array,
       default: () => []
+    },
+    listenScroll: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
-    return {
-    }
+    return {}
   },
   methods: {
     _initScroll () {
@@ -32,6 +35,13 @@ export default {
         probeType: this.probeType,
         click: this.click
       })
+
+      if (this.listenScroll) {
+        const me = this
+        this.scroll.on('scroll', (pos) => {
+          me.$emit('scroll', pos)
+        })
+      }
     },
     _enable () {
       this.scroll && this.scroll.enable()
@@ -41,6 +51,12 @@ export default {
     },
     _refresh () {
       this.scroll && this.scroll.refresh()
+    },
+    _scrollTo () {
+      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+    },
+    _scrollToElement () {
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
     }
   },
   watch: {
@@ -57,5 +73,4 @@ export default {
   }
 }
 </script>
-<style lang="stylus" scoped>
-</style>
+<style lang="stylus" scoped></style>
