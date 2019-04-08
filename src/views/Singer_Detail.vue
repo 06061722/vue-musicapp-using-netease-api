@@ -1,10 +1,11 @@
 <template>
   <transition name="slider">
-    <music-list :songArr="songArr"></music-list>
+    <music-list :title="title" :bg-image="bgImage" :songArr="songArr"></music-list>
   </transition>
 </template>
 
 <script>
+// 完全作为数据处理层（不包含任何UI）而存在，为了给引用的通用组件传递合适的数据。
 import { mapState } from 'vuex'
 import { getSingerDetail } from '@/api/singer'
 import { createSongArr } from '@/lib/utils'
@@ -21,7 +22,13 @@ export default {
   computed: {
     ...mapState({
       singer: state => state.singer
-    })
+    }),
+    title () {
+      return this.singer.name
+    },
+    bgImage () {
+      return this.singer.picUrl
+    }
   },
   methods: {
     _getSingerDetail () {
@@ -34,9 +41,6 @@ export default {
         this.songArr = createSongArr(res.hotSongs)
         console.log(this.songArr)
       })
-    },
-    _normalizeSongs (list) {
-
     }
   },
   created () {
