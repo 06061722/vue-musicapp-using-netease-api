@@ -1,11 +1,13 @@
 <template>
   <div class="singer" ref="singer">
-    <list-view :data="singers"></list-view>
+    <list-view :data="singers" @selectedItem="_selectedSinger"></list-view>
+    <router-view></router-view>
   </div>
 </template>
 <script>
 import { getSingerList } from '@/api/singer'
 import { Singer } from '@/lib/utils'
+import { mapMutations } from 'vuex'
 import ListView from '_c/listview/listview'
 const pinyin = require('pinyin')
 
@@ -21,6 +23,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['SET_SINGER']),
     _getSingerList () {
       getSingerList().then(res => {
         if (!res.code === 200) return
@@ -50,6 +53,10 @@ export default {
         return a.title.charCodeAt(0) - b.title.charCodeAt(0)
       })
       return hot.concat(abc)
+    },
+    _selectedSinger (singer) {
+      this.$router.push(`/singer/${singer.id}`)
+      this.SET_SINGER(singer)
     }
   },
   created () {

@@ -21,6 +21,13 @@ export default [
   {
     path: '/singer',
     name: 'singer',
-    component: () => import('@/views/Singer.vue')
+    component: () => import('@/views/Singer.vue'),
+    children: [
+      {
+        path: ':id',
+        name: 'singer_detail',
+        component: () => import('@/views/Singer_Detail.vue')
+      }
+    ]
   }
 ]
