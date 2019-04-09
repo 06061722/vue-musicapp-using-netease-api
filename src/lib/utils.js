@@ -38,10 +38,3 @@ export const createSongArr = (hotSongs) => {
   })
   return songArr
 }
-
-export const getData = (el, name, val) => {
-  const prefix = 'data-'
-  const finalName = prefix + name
-  if (val) return el.setAttribute(finalName, val)
-  else return el.getAttribute(finalName)
-}

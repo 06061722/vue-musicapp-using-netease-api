@@ -1,5 +1,5 @@
 <template>
-  <transition name="slider">
+  <transition name="slide">
     <music-list :title="title" :bg-image="bgImage" :songArr="songArr"></music-list>
   </transition>
 </template>
@@ -39,7 +39,6 @@ export default {
       getSingerDetail(this.singer.id).then(res => {
         if (res.code !== 200) return
         this.songArr = createSongArr(res.hotSongs)
-        console.log(this.songArr)
       })
     }
   },
@@ -50,8 +49,6 @@ export default {
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-@import '../assets/stylus/variable';
-
 .slide-enter-active, .slide-leave-active {
   transition: all 0.3s;
 }

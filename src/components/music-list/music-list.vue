@@ -1,10 +1,16 @@
 <template>
   <div class="music-list">
-    <div class="back">
+    <div class="back" @click="_back">
       <i class="icon-back"></i>
     </div>
     <h1 class="title">{{ title }}</h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div class="play-wrapper">
+        <div class="play" v-show="songArr.length > 0" ref="playBtn">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
       <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
@@ -19,6 +25,10 @@
       <div class="song-list-wrapper">
         <song-list :songArr="songArr"></song-list>
       </div>
+      <div ref="div"></div>
+      <div class="loading-container" v-show="!songArr.length">
+        <loading></loading>
+      </div>
     </scroll>
   </div>
 </template>
@@ -26,11 +36,17 @@
 <script type="text/ecmascript-6">
 import Scroll from '_c/scroll/scroll'
 import SongList from '_c/song-list/song-list'
+import Loading from '_c/loading/loading'
+import { prefixStyle } from '@/lib/tools'
+const TRANSFORM = prefixStyle('transform')
+const BACKDROP = prefixStyle('backdrop-filter')
 const RESERVED_HEIGHT = 40
+
 export default {
   components: {
     Scroll,
-    SongList
+    SongList,
+    Loading
   },
   props: {
     bgImage: {
@@ -59,38 +75,54 @@ export default {
   methods: {
     _scroll (pos) {
       this.ScrollY = pos.y
-    }
-  },
-  watch: {
-    ScrollY (newY) {
+    },
+    _back () {
+      this.$router.back()
+    },
+    _handleLayerUp (newY) {
       let translateY = Math.max(this.minTranslateY, newY)
-      this.$refs.layer.style['transform'] = `translate3d(0, ${translateY}px, 0)`
-      this.$refs.layer.style['webkitTransform'] = `translate3d(0, ${translateY}px, 0)`
+      this.$refs.layer.style[TRANSFORM] = `translate3d(0, ${translateY}px, 0)`
+    },
+    _handleLayerCoverAndBtbShow (newY) {
       let zIndex = 0
       if (newY < this.minTranslateY) {
         zIndex = 10
         this.$refs.bgImage.style.paddingTop = 0
         this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+        this.$refs.playBtn.style.display = 'none'
       } else {
         this.$refs.bgImage.style.paddingTop = '70%'
         this.$refs.bgImage.style.height = 0
+        this.$refs.playBtn.style.display = ''
       }
       this.$refs.bgImage.style.zIndex = zIndex
+    },
+    _handleScale (newY) {
       let scale = 1
+      let zIndex = 0
       const percent = Math.abs(newY / this.imageHeight)
       if (newY > 0) {
         scale = 1 + percent
         zIndex = 10
+        this.$refs.bgImage.style.zIndex = zIndex
       }
-      this.$refs.bgImage.style.zIndex = zIndex
-      this.$refs.bgImage.style['transform'] = `scale(${scale})`
-      this.$refs.bgImage.style['webkitTransform'] = `scale(${scale})`
+      this.$refs.bgImage.style[TRANSFORM] = `scale(${scale})`
+    },
+    _handleBlur (newY) {
       let blur = 0
+      const percent = Math.abs(newY / this.imageHeight)
       if (newY < 0) {
         blur = Math.min(20 * percent, 20)
       }
-      this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)`
-      this.$refs.filter.style['webkitBackdrop-filter'] = `blur(${blur}px)`
+      this.$refs.filter.style[BACKDROP] = `blur(${blur}px)`
+    }
+  },
+  watch: {
+    ScrollY (newY) {
+      this._handleLayerUp(newY)
+      this._handleLayerCoverAndBtbShow(newY)
+      this._handleScale(newY)
+      this._handleBlur(newY)
     }
   },
   mounted () {

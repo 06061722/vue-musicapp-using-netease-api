@@ -45,7 +45,7 @@
 <script type="text/ecmascript-6">
 import Scroll from '_c/scroll/scroll'
 import Loading from '_c/loading/loading'
-import { getData } from '@/lib/utils'
+import { getData } from '@/lib/tools'
 const ANCHOR_HEIGHT = 18
 const TITLE_HEIGHT = 30
 
