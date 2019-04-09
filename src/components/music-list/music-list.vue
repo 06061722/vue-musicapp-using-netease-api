@@ -23,7 +23,7 @@
       ref="list"
     >
       <div class="song-list-wrapper">
-        <song-list :songArr="songArr"></song-list>
+        <song-list :songArr="songArr" @selectedSong="_selectedSong"></song-list>
       </div>
       <div ref="div"></div>
       <div class="loading-container" v-show="!songArr.length">
@@ -38,6 +38,8 @@ import Scroll from '_c/scroll/scroll'
 import SongList from '_c/song-list/song-list'
 import Loading from '_c/loading/loading'
 import { prefixStyle } from '@/lib/tools'
+import { mapActions } from 'vuex'
+
 const TRANSFORM = prefixStyle('transform')
 const BACKDROP = prefixStyle('backdrop-filter')
 const RESERVED_HEIGHT = 40
@@ -73,6 +75,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['selectPlay']),
     _scroll (pos) {
       this.ScrollY = pos.y
     },
@@ -115,6 +118,9 @@ export default {
         blur = Math.min(20 * percent, 20)
       }
       this.$refs.filter.style[BACKDROP] = `blur(${blur}px)`
+    },
+    _selectedSong (song, index) {
+      this.selectPlay({ list: this.songArr, index })
     }
   },
   watch: {
