@@ -28,18 +28,25 @@
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{formatTimeOne(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" @percentChange="_onProgressBarChange"></progress-bar>
+            </div>
+            <span class="time time-r">{{formatTimeTwo(currentSong.time)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i @click="_prev" class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
-              <i @click="togglePlaying" :class="playIcon"></i>
+            <div class="icon i-center" :class="disableCls">
+              <i @click="_togglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i @click="_next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -58,30 +65,45 @@
           <p class="desc">{{ currentSong.singer }}</p>
         </div>
         <div class="control">
-          <div @click.stop="togglePlaying" :class="miniIcon"></div>
+          <progress-circle :radius="32" :percent="percent">
+          <div @click.stop="_togglePlaying" :class="miniIcon" class="icon-mini"></div>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <audio ref="audio"></audio>
+    <audio ref="audio" @canplay="_onReady" @error="_onError" @timeupdate="_updateTime"></audio>
   </div>
 </template>
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { prefixStyle } from '@/lib/tools'
+import { prefixStyle, formatTimeOne, formatTimeTwo } from '@/lib/tools'
 import { getSongUrl } from '@/api/singer'
+import ProgressCircle from '_c/progress-circle/progress-circle'
+import ProgressBar from '_c/progress-bar/progress-bar'
 import animations from 'create-keyframe-animation'
 
 const TRANSFORM = prefixStyle('transform')
 export default {
+  components: {
+    ProgressBar,
+    ProgressCircle
+  },
+  data () {
+    return {
+      songIsReady: false,
+      currentTime: 0
+    }
+  },
   computed: {
     ...mapState({
       fullScreen: state => state.fullScreen,
       playList: state => state.playList,
       currentSong: state => state.playList[state.currentIndex],
-      playing: state => state.playing
+      playing: state => state.playing,
+      currentIndex: state => state.currentIndex
     }),
     playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -91,10 +113,18 @@ export default {
     },
     cdCls () {
       return this.playing ? 'play' : 'play pause'
+    },
+    disableCls () {
+      return this.songIsReady ? '' : 'disable'
+    },
+    percent () {
+      return this.currentTime / (this.currentSong.time / 1000)
     }
   },
   methods: {
-    ...mapMutations(['SET_FULL_SCREEN', 'SET_PLAYING_STATE']),
+    formatTimeOne,
+    formatTimeTwo,
+    ...mapMutations(['SET_FULL_SCREEN', 'SET_PLAYING_STATE', 'SET_CURRENT_INDEX']),
     _back () {
       this.SET_FULL_SCREEN(false)
     },
@@ -114,7 +144,7 @@ export default {
           transform: `translate3d(0, 0, 0) scale(1)`
         }
       }
-      animations.registerAnimation({
+      animations.registerAnimation({ // 使用的CSS动画库太久了，需要更换
         name: 'move',
         animation,
         presets: {
@@ -149,23 +179,52 @@ export default {
       const y = window.innerHeight - paddingTop - width / 2 - paddingBottom
       return { x, y, scale }
     },
-    togglePlaying () {
+    _togglePlaying () {
+      if (!this.songIsReady) return
       this.SET_PLAYING_STATE(!this.playing)
+    },
+    _prev () {
+      if (!this.songIsReady) return
+      let index = this.currentIndex - 1
+      if (index === -1) index = this.playList.length - 1
+      this.SET_CURRENT_INDEX(index)
+      if (!this.playing) this._togglePlaying()
+    },
+    _next () {
+      if (!this.songIsReady) return
+      let index = this.currentIndex + 1
+      if (index === this.playList.length) index = 0
+      this.SET_CURRENT_INDEX(index)
+      if (!this.playing) this._togglePlaying()
+    },
+    _onReady () {
+      this.songIsReady = true
+    },
+    _onError () {
+      this.songIsReady = true
+    },
+    _updateTime (e) {
+      this.currentTime = e.target.currentTime
+    },
+    _onProgressBarChange (percent) {
+      this.$refs.audio.currentTime = percent * (this.currentSong.time / 1000)
     }
   },
   watch: {
     currentSong () {
-      this.$nextTick(() => {
-        getSongUrl(this.currentSong.id).then(res => {
-          this.$refs.audio.src = res.data[0].url
-          this.$refs.audio.play()
-        })
+      console.log(this.currentSong)
+      this.songIsReady = false
+      getSongUrl(this.currentSong.id).then(res => {
+        this.$refs.audio.src = res.data[0].url
       })
     },
     playing (playing) {
-      this.$nextTick(() => {
+      if (this.songIsReady) {
         playing ? this.$refs.audio.play() : this.$refs.audio.pause()
-      })
+      }
+    },
+    songIsReady () {
+      this.$refs.audio.play()
     }
   }
 }

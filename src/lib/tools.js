@@ -24,3 +24,23 @@ export const prefixStyle = (style) => {
   if (vendor === 'standard') return style
   return vendor + style.charAt(0).toUpperCase() + style.substr(1)
 }
+
+export const formatTimeOne = (raw) => {
+  function pad (num, n = 2) {
+    let len = num.toString().length
+    while (len < n) {
+      num = '0' + num
+      len++
+    }
+    return num
+  }
+  raw = raw | 0
+  const minute = raw / 60 | 0
+  const second = pad(raw % 60)
+  return `${minute}:${second}`
+}
+export const formatTimeTwo = (raw) => {
+  raw = raw / 1000
+  raw = formatTimeOne(raw)
+  return raw
+}

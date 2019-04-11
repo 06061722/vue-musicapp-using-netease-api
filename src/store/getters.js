@@ -1,7 +1,3 @@
-const getters = {
-  currentSong (state) {
-    return state.playList[state.currentIndex] || {}
-  }
-}
+const getters = {}
 
 export default getters
