@@ -6,7 +6,7 @@
     <h1 class="title">{{ title }}</h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="play-wrapper">
-        <div class="play" v-show="songArr.length > 0" ref="playBtn">
+        <div class="play" v-show="songArr.length > 0" ref="playBtn" @click="_random">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -75,7 +75,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['selectPlay']),
+    ...mapActions(['selectPlay', 'randomPlay']),
     _scroll (pos) {
       this.ScrollY = pos.y
     },
@@ -121,6 +121,9 @@ export default {
     },
     _selectedSong (song, index) {
       this.selectPlay({ list: this.songArr, index })
+    },
+    _random () {
+      this.randomPlay({ list: this.songArr })
     }
   },
   watch: {

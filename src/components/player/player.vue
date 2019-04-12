@@ -36,8 +36,8 @@
             <span class="time time-r">{{formatTimeTwo(currentSong.time)}}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div class="icon i-left" @click="_changeMode">
+              <i :class="iconMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
               <i @click="_prev" class="icon-prev"></i>
@@ -66,7 +66,7 @@
         </div>
         <div class="control">
           <progress-circle :radius="32" :percent="percent">
-          <div @click.stop="_togglePlaying" :class="miniIcon" class="icon-mini"></div>
+            <div @click.stop="_togglePlaying" :class="miniIcon" class="icon-mini"></div>
           </progress-circle>
         </div>
         <div class="control">
@@ -74,12 +74,18 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" @canplay="_onReady" @error="_onError" @timeupdate="_updateTime"></audio>
+    <audio
+      ref="audio"
+      @canplay="_onReady"
+      @error="_onError"
+      @timeupdate="_onUpdateTime"
+      @ended="_onEnd"
+    ></audio>
   </div>
 </template>
 <script>
 import { mapState, mapMutations } from 'vuex'
-import { prefixStyle, formatTimeOne, formatTimeTwo } from '@/lib/tools'
+import { prefixStyle, formatTimeOne, formatTimeTwo, shuffle } from '@/lib/tools'
 import { getSongUrl } from '@/api/singer'
 import ProgressCircle from '_c/progress-circle/progress-circle'
 import ProgressBar from '_c/progress-bar/progress-bar'
@@ -103,7 +109,9 @@ export default {
       playList: state => state.playList,
       currentSong: state => state.playList[state.currentIndex],
       playing: state => state.playing,
-      currentIndex: state => state.currentIndex
+      currentIndex: state => state.currentIndex,
+      mode: state => state.mode,
+      sequenceList: state => state.sequenceList
     }),
     playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -119,12 +127,15 @@ export default {
     },
     percent () {
       return this.currentTime / (this.currentSong.time / 1000)
+    },
+    iconMode () { // 0: sequence, 1: loop, 2: random
+      return this.mode === 0 ? 'icon-sequence' : this.mode === 1 ? 'icon-loop' : 'icon-random'
     }
   },
   methods: {
     formatTimeOne,
     formatTimeTwo,
-    ...mapMutations(['SET_FULL_SCREEN', 'SET_PLAYING_STATE', 'SET_CURRENT_INDEX']),
+    ...mapMutations(['SET_FULL_SCREEN', 'SET_PLAYING_STATE', 'SET_CURRENT_INDEX', 'SET_PLAY_MODE', 'SET_PLAYLIST']),
     _back () {
       this.SET_FULL_SCREEN(false)
     },
@@ -203,16 +214,36 @@ export default {
     _onError () {
       this.songIsReady = true
     },
-    _updateTime (e) {
+    _onUpdateTime (e) {
       this.currentTime = e.target.currentTime
+    },
+    _onEnd () {
+      if (this.mode === 1) {
+        this.$refs.currentTime = 0
+        this.$refs.audio.play()
+      } else {
+        this._next()
+      }
     },
     _onProgressBarChange (percent) {
       this.$refs.audio.currentTime = percent * (this.currentSong.time / 1000)
+    },
+    _changeMode () {
+      const mode = (this.mode + 1) % 3
+      this.SET_PLAY_MODE(mode)
+      let list = []
+      if (mode === 2) list = shuffle(this.sequenceList)
+      else list = this.sequenceList
+      let index = list.findIndex(item => item.id === this.currentSong.id)
+      this.SET_PLAYLIST(list)
+      this.SET_CURRENT_INDEX(index)
     }
   },
   watch: {
-    currentSong () {
-      console.log(this.currentSong)
+    currentSong (newSong, oldSong) {
+      if (oldSong && newSong.id === oldSong.id) {
+        return
+      }
       this.songIsReady = false
       getSongUrl(this.currentSong.id).then(res => {
         this.$refs.audio.src = res.data[0].url
@@ -224,7 +255,9 @@ export default {
       }
     },
     songIsReady () {
+      if (!this.songIsReady) return
       this.$refs.audio.play()
+      console.log(233)
     }
   }
 }
