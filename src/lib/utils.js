@@ -1,3 +1,5 @@
+import { getLyric } from '@/api/singer'
+
 export class Singer {
   constructor (id, name, picUrl) {
     this.id = id
@@ -13,6 +15,20 @@ export class Song {
     this.time = time
     this.singer = singer
     this.picUrl = picUrl
+  }
+
+  getLyric () {
+    if (this.lyric) return new Promise(resolve => resolve(this.lyric))
+    return new Promise((resolve, reject) => {
+      getLyric(this.id).then(res => {
+        if (res.code === 200) {
+          this.lyric = res.lrc.lyric
+          resolve(this.lyric)
+        } else {
+          reject(new Error('No lyric'))
+        }
+      })
+    })
   }
 }
 

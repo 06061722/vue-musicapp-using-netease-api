@@ -18,16 +18,38 @@
           <h1 class="title">{{ currentSong.name }}</h1>
           <h2 class="subtitle">{{ currentSong.singer }}</h2>
         </div>
-        <div class="middle">
-          <div class="middle-l">
+        <div
+          class="middle"
+          @touchstart.prevent="_middleTouchStart"
+          @touchmove.prevent="_middleTouchMove"
+          @touchend.prevent="_middleTouchEnd"
+        >
+          <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.picUrl">
               </div>
             </div>
           </div>
+          <scroll class="middle-r" ref="lyricList" :data="currentLyric.lines">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p
+                  class="text"
+                  ref="lyricLine"
+                  v-for="(line, index) in currentLyric.lines"
+                  :key="index"
+                  :class="{current: currentLyricLineNum === index}"
+                >{{ line.txt }}</p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active': currentShow === 'cd'}"></span>
+            <span class="dot" :class="{'active': currentShow === 'lyric'}"></span>
+          </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{formatTimeOne(currentTime)}}</span>
             <div class="progress-bar-wrapper">
@@ -89,18 +111,26 @@ import { prefixStyle, formatTimeOne, formatTimeTwo, shuffle } from '@/lib/tools'
 import { getSongUrl } from '@/api/singer'
 import ProgressCircle from '_c/progress-circle/progress-circle'
 import ProgressBar from '_c/progress-bar/progress-bar'
+import Scroll from '_c/scroll/scroll'
+
 import animations from 'create-keyframe-animation'
+import LyricParser from 'lyric-parser'
 
 const TRANSFORM = prefixStyle('transform')
+const TRANSITIONDURATION = prefixStyle('transitionDuration')
 export default {
   components: {
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Scroll
   },
   data () {
     return {
       songIsReady: false,
-      currentTime: 0
+      currentTime: 0,
+      currentLyric: '',
+      currentLyricLineNum: 0,
+      currentShow: 'cd'
     }
   },
   computed: {
@@ -237,6 +267,67 @@ export default {
       let index = list.findIndex(item => item.id === this.currentSong.id)
       this.SET_PLAYLIST(list)
       this.SET_CURRENT_INDEX(index)
+    },
+    _getLyric () {
+      this.currentSong.getLyric().then(lyric => {
+        this.currentLyric = new LyricParser(lyric, this._handleLyric)
+        if (this.playing) this.currentLyric.play()
+      })
+    },
+    _handleLyric (line) {
+      this.currentLyricLineNum = line.lineNum
+      if (line.lineNum > 5) {
+        let lineEl = this.$refs.lyricLine[line.lineNum - 5]
+        this.$refs.lyricList._scrollToElement(lineEl, 1000)
+      } else {
+        this.$refs.lyricList._scrollTo(0, 0, 1000)
+      }
+    },
+    _middleTouchStart (e) {
+      this.touch.initiated = true
+      const touch = e.touches[0]
+      this.touch.startX = touch.pageX
+      this.touch.startY = touch.pageY
+    },
+    _middleTouchMove (e) {
+      if (!this.touch.initiated) return
+      const touch = e.touches[0]
+      const deltaX = touch.pageX - this.touch.startX
+      const deltaY = touch.pageY - this.touch.startY
+      if (Math.abs(deltaY) > Math.abs(deltaX)) return
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
+      const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX))
+      this.$refs.lyricList.$el.style[TRANSFORM] = `translate3d(${offsetWidth}px, 0, 0)`
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent
+    },
+    _middleTouchEnd (e) {
+      let offsetWidth
+      let opacity
+      if (this.currentShow === 'cd') {
+        if (this.touch.percent > 0.1) {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+          this.currentShow = 'lyric'
+        } else {
+          offsetWidth = 0
+          opacity = 1
+        }
+      } else {
+        if (this.touch.percent < 0.9) {
+          offsetWidth = 0
+          opacity = 1
+          this.currentShow = 'cd'
+        } else {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+        }
+      }
+      const time = 300
+      this.$refs.lyricList.$el.style[TRANSFORM] = `translate3d(${offsetWidth}px, 0, 0)`
+      this.$refs.lyricList.$el.style[TRANSITIONDURATION] = `${time}ms`
+      this.$refs.middleL.style.opacity = opacity
+      this.touch = {}
     }
   },
   watch: {
@@ -248,6 +339,7 @@ export default {
       getSongUrl(this.currentSong.id).then(res => {
         this.$refs.audio.src = res.data[0].url
       })
+      this._getLyric()
     },
     playing (playing) {
       if (this.songIsReady) {
@@ -257,8 +349,10 @@ export default {
     songIsReady () {
       if (!this.songIsReady) return
       this.$refs.audio.play()
-      console.log(233)
     }
+  },
+  created () {
+    this.touch = {}
   }
 }
 </script>

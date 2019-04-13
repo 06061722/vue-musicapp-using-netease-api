@@ -28,3 +28,10 @@ export const getSongUrl = (songId) => {
     method: 'get'
   })
 }
+
+export const getLyric = (songId) => {
+  return axios.request({
+    url: `http://localhost:3000/lyric?id=${songId}`,
+    method: 'get'
+  })
+}
