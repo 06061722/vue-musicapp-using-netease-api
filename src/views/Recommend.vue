@@ -1,6 +1,6 @@
 <template>
   <div class="recommend" ref="recommend">
-    <scroll ref="scroll" class="recommend-content" :data="playList">
+    <scroll ref="scroll" class="recommend-content" :data="recommendList">
       <div>
         <div class="slider-wrapper">
           <slider :banners="banners" @onImgLoaded="_onImgLoaded"></slider>
@@ -8,7 +8,7 @@
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li class="item" v-for="(item, index) in playList" :key="index">
+            <li class="item" v-for="(item, index) in recommendList" :key="index">
               <div class="icon">
                 <img width="60" height="60" v-lazy="item.coverImgUrl" alt>
               </div>
@@ -20,7 +20,7 @@
           </ul>
         </div>
       </div>
-      <div class="loading-container" v-show="!playList.length">
+      <div class="loading-container" v-show="!recommendList.length">
         <loading></loading>
       </div>
     </scroll>
@@ -28,10 +28,12 @@
 </template>
 <script>
 import { getRecommend, getPlayList } from '@/api/recommend'
+import { playListMixin } from '@/lib/mixin'
 import Slider from '_c/slider/slider'
 import Scroll from '_c/scroll/scroll'
 import Loading from '_c/loading/loading'
 export default {
+  mixins: [playListMixin],
   components: {
     Slider,
     Scroll,
@@ -40,10 +42,15 @@ export default {
   data () {
     return {
       banners: [],
-      playList: []
+      recommendList: []
     }
   },
   methods: {
+    handlePlayList (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.recommend.style.bottom = bottom
+      this.$refs.scroll._refresh()
+    },
     filterBanners (banners) {
       return banners.filter(item => item.targetType === 1 || item.targetType === 10)
     },
@@ -55,7 +62,7 @@ export default {
       })
       getPlayList().then(res => {
         if (!res === 200) return
-        this.playList = res.playlists
+        this.recommendList = res.playlists
       })
     },
     _onImgLoaded () {

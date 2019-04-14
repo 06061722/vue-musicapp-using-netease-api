@@ -1,3 +1,5 @@
+import { Song } from '@/lib/utils'
+
 export const getData = (el, name, val) => {
   const prefix = 'data-'
   const finalName = prefix + name
@@ -45,17 +47,18 @@ export const formatTimeTwo = (raw) => {
   return raw
 }
 
-export const shuffle = (arr) => {
-  arr = JSON.parse(JSON.stringify(arr))
+export const shuffle = (orderArr) => {
+  let mixedArr = orderArr.map(song => {
+    return new Song({ id: song.id, name: song.name, time: song.time, singer: song.singer, picUrl: song.picUrl })
+  })
   function getRandomInt (min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
-  for (let i = 0; i < arr.length; i++) {
+  for (let i = 0; i < mixedArr.length; i++) {
     let j = getRandomInt(0, i)
-    let t = arr[i]
-    arr[i] = arr[j]
-    arr[j] = t
+    let t = mixedArr[i]
+    mixedArr[i] = mixedArr[j]
+    mixedArr[j] = t
   }
-  console.log('shuffle')
-  return arr
+  return mixedArr
 }

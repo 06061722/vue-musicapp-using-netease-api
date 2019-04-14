@@ -16,7 +16,6 @@ export class Song {
     this.singer = singer
     this.picUrl = picUrl
   }
-
   getLyric () {
     if (this.lyric) return new Promise(resolve => resolve(this.lyric))
     return new Promise((resolve, reject) => {

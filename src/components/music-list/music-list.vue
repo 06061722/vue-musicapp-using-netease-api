@@ -39,12 +39,14 @@ import SongList from '_c/song-list/song-list'
 import Loading from '_c/loading/loading'
 import { prefixStyle } from '@/lib/tools'
 import { mapActions } from 'vuex'
+import { playListMixin } from '@/lib/mixin'
 
 const TRANSFORM = prefixStyle('transform')
 const BACKDROP = prefixStyle('backdrop-filter')
 const RESERVED_HEIGHT = 40
 
 export default {
+  mixins: [playListMixin],
   components: {
     Scroll,
     SongList,
@@ -75,6 +77,11 @@ export default {
     }
   },
   methods: {
+    handlePlayList (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.list.$el.style.bottom = bottom
+      this.$refs.list._refresh()
+    },
     ...mapActions(['selectPlay', 'randomPlay']),
     _scroll (pos) {
       this.ScrollY = pos.y

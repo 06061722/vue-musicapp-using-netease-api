@@ -110,6 +110,9 @@ export default {
     },
     _selectedItem (item) {
       this.$emit('selectedItem', item)
+    },
+    _refresh () {
+      this.$refs.listview && this.$refs.listview._refresh()
     }
   },
   watch: {
