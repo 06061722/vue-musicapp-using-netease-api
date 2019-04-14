@@ -12,3 +12,9 @@ export const getPlayList = (limit = 30) => {
     method: 'get'
   })
 }
+
+export const getDiscDetail = (discId) => {
+  return axios.request({
+    url: `/playlist/detail?id=${discId}`
+  })
+}

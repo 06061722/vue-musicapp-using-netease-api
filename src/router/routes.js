@@ -6,7 +6,14 @@ export default [
   {
     path: '/recommend',
     name: 'recommend',
-    component: () => import('@/views/Recommend.vue')
+    component: () => import('@/views/Recommend.vue'),
+    children: [
+      {
+        path: ':id',
+        name: 'disc',
+        component: () => import('@/views/disc.vue')
+      }
+    ]
   },
   {
     path: '/rank',
