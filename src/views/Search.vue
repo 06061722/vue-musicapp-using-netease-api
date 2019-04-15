@@ -1,12 +1,51 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
+      <search-box ref="searchBox"></search-box>
     </div>
-    <div ref="shortcutWrapper" class="shortcut-wrapper"></div>
-    <div class="search-result" ref="searchResult"></div>
-    <router-view></router-view>
+    <div class="shortcut-wrapper">
+      <div class="shortcut">
+        <div class="hot-key">
+          <h1 class="title">热门搜索</h1>
+          <ul>
+            <li class="item" v-for="(item, index) in hotKey" :key="index" @click="_addQuery(item.first)">
+              <span>{{ item.first }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+<script>
+import SearchBox from '_c/search-box/search-box'
+import { getHotKey } from '@/api/search'
+export default {
+  components: {
+    SearchBox
+  },
+  data () {
+    return {
+      hotKey: []
+    }
+  },
+  methods: {
+    _getHotKey () {
+      getHotKey().then(res => {
+        if (res.code === 200) {
+          this.hotKey = res.result.hots
+        }
+      })
+    },
+    _addQuery (query) {
+      this.$refs.searchBox._setQuery(query)
+    }
+  },
+  created () {
+    this._getHotKey()
+  }
+}
+</script>
 
 <style lang="stylus" rel="stylesheet/stylus">
 @import '../assets/stylus/variable';
