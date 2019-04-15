@@ -7,7 +7,7 @@
 <script>
 // 完全作为数据处理层（不包含任何UI）而存在，为了给引用的通用组件传递合适的数据。
 import { mapState } from 'vuex'
-import { getSingerDetail } from '@/api/singer'
+import { getSingerDetail } from '@/api/singerandsong'
 import { createSongArr } from '@/lib/utils'
 import MusicList from '_c/music-list/music-list'
 export default {

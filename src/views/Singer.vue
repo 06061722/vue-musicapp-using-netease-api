@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-import { getSingerList } from '@/api/singer'
+import { getSingerList } from '@/api/singerandsong'
 import { Singer } from '@/lib/utils'
 import { mapMutations } from 'vuex'
 import { playListMixin } from '@/lib/mixin'

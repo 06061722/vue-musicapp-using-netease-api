@@ -6,7 +6,8 @@ const mutations = {
   SET_SEQUENCE_LIST (state, list) { state.sequenceList = list },
   SET_PLAY_MODE (state, flag) { state.mode = flag },
   SET_CURRENT_INDEX (state, index) { state.currentIndex = index },
-  SET_DISC (state, disc) { state.disc = disc }
+  SET_DISC (state, disc) { state.disc = disc },
+  SET_TOP_LIST (state, list) { state.topList = list }
 }
 
 export default mutations

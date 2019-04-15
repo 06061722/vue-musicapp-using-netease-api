@@ -111,7 +111,7 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 import { prefixStyle, formatTimeOne, formatTimeTwo, shuffle } from '@/lib/tools'
-import { getSongUrl } from '@/api/singer'
+import { getSongUrl } from '@/api/singerandsong'
 import ProgressCircle from '_c/progress-circle/progress-circle'
 import ProgressBar from '_c/progress-bar/progress-bar'
 import Scroll from '_c/scroll/scroll'

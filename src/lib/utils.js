@@ -1,4 +1,4 @@
-import { getLyric } from '@/api/singer'
+import { getLyric } from '@/api/singerandsong'
 
 export class Singer {
   constructor (id, name, picUrl) {

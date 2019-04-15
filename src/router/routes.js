@@ -11,14 +11,21 @@ export default [
       {
         path: ':id',
         name: 'disc',
-        component: () => import('@/views/disc.vue')
+        component: () => import('@/views/Disc.vue')
       }
     ]
   },
   {
     path: '/rank',
     name: 'rank',
-    component: () => import('@/views/Rank.vue')
+    component: () => import('@/views/Rank.vue'),
+    children: [
+      {
+        path: ':id',
+        name: 'rankDetail',
+        component: () => import('@/views/Rank_Detail.vue')
+      }
+    ]
   },
   {
     path: '/search',

@@ -23,7 +23,7 @@
       ref="list"
     >
       <div class="song-list-wrapper">
-        <song-list :songArr="songArr" @selectedSong="_selectedSong"></song-list>
+        <song-list :songArr="songArr" @selectedSong="_selectedSong" :rank="rank"></song-list>
       </div>
       <div ref="div"></div>
       <div class="loading-container" v-show="!songArr.length">
@@ -64,6 +64,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
