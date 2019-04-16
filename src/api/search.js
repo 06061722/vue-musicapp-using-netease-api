@@ -7,15 +7,16 @@ export const getHotKey = () => {
   })
 }
 
-export const searchHotKey = (query, page) => {
-  const offset = page * 30
+export const searchHotKey = ({ query, page = 1, limit = 30 }) => {
+  if (!query) return Promise.resolve()
+  const offset = (page - 1) * limit
   return axios.request({
     url: `/search?keywords=${query}&offset=${offset}`,
     method: 'get'
   })
 }
 
-export const searchHotKeySuggest = (query) => {
+export const searchHotKeySuggest = ({ query = '' }) => {
   return axios.request({
     url: `/search/suggest?keywords=${query}`,
     method: 'get'

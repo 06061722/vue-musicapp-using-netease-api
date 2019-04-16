@@ -1,36 +1,89 @@
 <template>
-  <scroll class="suggest">
+  <scroll class="suggest" :data="result" :pullUp="pullUp" @scrollToEnd="_searchMore">
     <ul class="suggest-list">
-      <li class="suggest-item">
+      <li class="suggest-item" v-for="(item, index) in result" :key="index">
         <div class="icon">
-          <i></i>
+          <i :class="_getIconCls(item)"></i>
         </div>
         <div class="name">
-          <p class="text"></p>
+          <p class="text">{{_getDisplayName(item)}}</p>
         </div>
       </li>
+      <loading v-show="hasMore" title></loading>
     </ul>
   </scroll>
 </template>
 
 <script type="text/ecmascript-6">
-import { searchHotKey, searchHotKeySuggest } from '@/api/search'
+import { searchHotKey } from '@/api/search'
+import { createSearchSong } from '@/lib/utils'
+import Scroll from '_c/scroll/scroll'
+import Loading from '_c/loading/loading'
+const LIMIT = 30
 export default {
   props: {
     query: {
       type: String,
       default: ''
+    },
+    showSinger: {
+      type: Boolean,
+      default: true
     }
+  },
+  components: {
+    Scroll,
+    Loading
   },
   data () {
     return {
-      page: 0
+      page: 1,
+      result: [],
+      pullUp: true,
+      hasMore: true
     }
   },
   methods: {
     _search () {
-      searchHotKey(this.query, this.page)// 两个异步的请求
-      searchHotKeySuggest(this.query)
+      this.hasMore = true
+      this.page = 1
+      if (this.showSinger) { // 两个异步的请求
+        searchHotKey({ query: this.query, page: this.page, limit: LIMIT }).then(res => {
+          if (res && res.code === 200 && res.result.songs) {
+            const singer = res.result.songs[0].artists
+            this.result = singer.concat(createSearchSong(res.result.songs))
+          }
+          this._checkMore({ page: this.page, limit: LIMIT, songCount: res === undefined ? 0 : res.result.songCount })
+          if (res && res.result.songCount === 0) this.result = []
+        })
+      }
+    },
+    _getIconCls (item) {
+      if (item) {
+        if (!item.singer) return 'icon-mine'
+        else return 'icon-music'
+      }
+    },
+    _getDisplayName (item) {
+      if (item) {
+        if (!item.singer) return item.name
+        else return `${item.name}--${item.singer}`
+      }
+    },
+    _searchMore () {
+      if (this.hasMore) {
+        this.page++
+        searchHotKey({ query: this.query, page: this.page, limit: LIMIT }).then(res => {
+          if (res && res.code === 200) {
+            this.result = this.result.concat(res.result.songs)
+            this._checkMore({ page: this.page, limit: LIMIT, songCount: res.result.songCount })
+          }
+        })
+      }
+    },
+    _checkMore ({ page, limit, songCount }) {
+      const offset = (page - 1) * limit
+      if (!songCount || offset >= songCount) this.hasMore = false
     }
   },
   watch: {

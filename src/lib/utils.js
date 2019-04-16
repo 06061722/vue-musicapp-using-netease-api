@@ -17,7 +17,7 @@ export class Song {
     this.picUrl = picUrl
   }
   getLyric () {
-    if (this.lyric) return new Promise(resolve => resolve(this.lyric))
+    if (this.lyric) return Promise.resolve(this.lyric)
     return new Promise((resolve, reject) => {
       getLyric(this.id).then(res => {
         if (res.code === 200) {
@@ -46,6 +46,29 @@ export const createSongArr = (hotSongs) => {
     singer = singer.slice(0, -1)
     picUrl = item.al.picUrl
     time = item.dt
+    name = item.name
+    id = item.id
+    const song = new Song({ id, name, time, singer, picUrl })
+    songArr.push(song)
+  })
+  return songArr
+}
+
+export const createSearchSong = (searchList) => {
+  let songArr = []
+  let id
+  let name
+  let time
+  let singer
+  let picUrl
+  searchList.forEach(item => {
+    singer = ''
+    item.artists.forEach(item => {
+      singer += item.name + '/'
+    })
+    singer = singer.slice(0, -1)
+    picUrl = item.artists[0].img1v1Url
+    time = item.duration
     name = item.name
     id = item.id
     const song = new Song({ id, name, time, singer, picUrl })
