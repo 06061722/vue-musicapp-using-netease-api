@@ -115,6 +115,7 @@ export default {
       } else {
         this.insertSong(item)
       }
+      this.$emit('select')
     },
     _listScroll () {
       this.$emit('_listScroll')

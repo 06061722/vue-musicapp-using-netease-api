@@ -76,3 +76,19 @@ export const createSearchSong = (searchList) => {
   })
   return songArr
 }
+
+export const saveSearch = (query) => {
+  const SEARCHHISTORY_MAX_LEN = 15
+  const KEY = '__searchHistory__'
+  function insertArray (arr, val, compare, maxLen) {
+    const index = arr.findIndex(compare)
+    if (index === 0) return
+    if (index > 0) arr.splice(index, 1)
+    arr.unshift(val)
+    if (maxLen && maxLen > SEARCHHISTORY_MAX_LEN) arr.pop()
+  }
+  let searchHistoryArr = localStorage.getItem(KEY) === null ? [] : JSON.parse(localStorage.getItem(KEY))
+  insertArray(searchHistoryArr, query, item => item === query, SEARCHHISTORY_MAX_LEN)
+  localStorage.setItem(KEY, JSON.stringify(searchHistoryArr))
+  return searchHistoryArr
+}

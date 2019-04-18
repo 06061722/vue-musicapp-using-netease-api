@@ -7,7 +7,8 @@ const mutations = {
   SET_PLAY_MODE (state, flag) { state.mode = flag },
   SET_CURRENT_INDEX (state, index) { state.currentIndex = index },
   SET_DISC (state, disc) { state.disc = disc },
-  SET_TOP_LIST (state, list) { state.topList = list }
+  SET_TOP_LIST (state, list) { state.topList = list },
+  SET_SEARCH_HISTORY (state, history) { state.searchHistory = history }
 }
 
 export default mutations

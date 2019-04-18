@@ -1,4 +1,5 @@
 import { shuffle } from '@/lib/tools'
+import { saveSearch } from '@/lib/utils'
 
 const actions = {
   selectPlay ({ commit, state }, { index, list }) {
@@ -56,6 +57,9 @@ const actions = {
     commit('SET_CURRENT_INDEX', currentIndex)
     commit('SET_FULL_SCREEN', true)
     commit('SET_PLAYING_STATE', true)
+  },
+  saveSearchHistory ({ commit }, query) {
+    commit('SET_SEARCH_HISTORY', saveSearch(query))
   }
 }
 

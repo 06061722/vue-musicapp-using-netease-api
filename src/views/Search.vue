@@ -18,10 +18,19 @@
             </li>
           </ul>
         </div>
+        <div class="search-history" v-show="searchHistory.length">
+          <h1 class="title">
+            <span class="text">搜索历史</span>
+            <span class="clear">
+              <i class="icon-clear"></i>
+            </span>
+          </h1>
+          <search-list :searches="searchHistory"></search-list>
+        </div>
       </div>
     </div>
     <div class="search-result" v-show="query">
-      <suggest :query="query" @_listScroll="_blurInput"></suggest>
+      <suggest :query="query" @_listScroll="_blurInput" @select="_saveSearch"></suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -29,11 +38,14 @@
 <script>
 import SearchBox from '_c/search-box/search-box'
 import Suggest from '_c/suggest/suggest'
+import SearchList from '_c/search-list/search-list'
 import { getHotKey } from '@/api/search'
+import { mapState, mapActions } from 'vuex'
 export default {
   components: {
     SearchBox,
-    Suggest
+    Suggest,
+    SearchList
   },
   data () {
     return {
@@ -41,7 +53,11 @@ export default {
       query: ''
     }
   },
+  computed: {
+    ...mapState(['searchHistory'])
+  },
   methods: {
+    ...mapActions(['saveSearchHistory']),
     _getHotKey () {
       getHotKey().then(res => {
         if (res.code === 200) {
@@ -57,6 +73,9 @@ export default {
     },
     _blurInput () {
       this.$refs.searchBox._blur()
+    },
+    _saveSearch () {
+      this.saveSearchHistory(this.query)
     }
   },
   created () {

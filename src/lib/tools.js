@@ -79,7 +79,7 @@ export const debounce = (func, delay) => {
   return (...args) => {
     if (timer) clearTimeout(timer)
     timer = setTimeout(() => {
-      console.log(this) // expected: undefined ??
+      // console.log(this) // expected: undefined ??
       func.apply(this, args)
     }, delay)
   }
