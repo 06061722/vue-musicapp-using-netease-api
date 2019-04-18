@@ -1,5 +1,5 @@
 import { shuffle } from '@/lib/tools'
-import { saveSearch } from '@/lib/utils'
+import { saveSearch, deleteSearch, clearSearch } from '@/lib/utils'
 
 const actions = {
   selectPlay ({ commit, state }, { index, list }) {
@@ -60,6 +60,12 @@ const actions = {
   },
   saveSearchHistory ({ commit }, query) {
     commit('SET_SEARCH_HISTORY', saveSearch(query))
+  },
+  deleteSearchHistory ({ commit }, query) {
+    commit('SET_SEARCH_HISTORY', deleteSearch(query))
+  },
+  clearSeachHistory ({ commit }) {
+    commit('SET_SEARCH_HISTORY', clearSearch())
   }
 }
 

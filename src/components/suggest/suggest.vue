@@ -1,5 +1,6 @@
 <template>
   <scroll
+    ref="scroll"
     class="suggest"
     :data="result"
     :pullUp="pullUp"
@@ -107,7 +108,6 @@ export default {
       if (!songCount || offset >= songCount) this.hasMore = false
     },
     _selectedItem (item) {
-      console.log(item)
       if (!item.singer) {
         const singer = new Singer({ id: item.id, name: item.name, picUrl: item.img1v1Url })
         this.SET_SINGER(singer)
@@ -119,6 +119,9 @@ export default {
     },
     _listScroll () {
       this.$emit('_listScroll')
+    },
+    _refresh () {
+      this.$refs.scroll._refresh()
     }
   },
   watch: {
