@@ -42,13 +42,13 @@ export default {
       arr['HOT'] = { title: HOT_NAME, items: [] }
       artists.forEach((item, index) => {
         if (index < HOT_SINGER_LEN) {
-          arr['HOT'].items.push(new Singer(item.id, item.name, item.picUrl))
+          arr['HOT'].items.push(new Singer({ id: item.id, name: item.name, picUrl: item.picUrl }))
         }
         const key = pinyin(item.name[0], {
           style: pinyin.STYLE_FIRST_LETTER
         })[0][0].toUpperCase()
         if (!arr[key]) arr[key] = { title: key, items: [] }
-        arr[key].items.push(new Singer(item.id, item.name, item.picUrl))
+        arr[key].items.push(new Singer({ id: item.id, name: item.name, picUrl: item.picUrl }))
       })
       let hot = []
       let abc = []

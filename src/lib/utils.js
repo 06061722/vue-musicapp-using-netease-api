@@ -1,7 +1,7 @@
 import { getLyric } from '@/api/singerandsong'
 
 export class Singer {
-  constructor (id, name, picUrl) {
+  constructor ({ id, name, picUrl }) {
     this.id = id
     this.name = name
     this.picUrl = picUrl

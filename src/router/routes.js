@@ -30,7 +30,14 @@ export default [
   {
     path: '/search',
     name: 'search',
-    component: () => import('@/views/Search.vue')
+    component: () => import('@/views/Search.vue'),
+    children: [
+      {
+        path: ':id',
+        name: 'singer_detail_2',
+        component: () => import('@/views/Singer_Detail.vue')
+      }
+    ]
   },
   {
     path: '/singer',
@@ -39,7 +46,7 @@ export default [
     children: [
       {
         path: ':id',
-        name: 'singer_detail',
+        name: 'singer_detail_1',
         component: () => import('@/views/Singer_Detail.vue')
       }
     ]

@@ -8,7 +8,12 @@
         <div class="hot-key">
           <h1 class="title">热门搜索</h1>
           <ul>
-            <li class="item" v-for="(item, index) in hotKey" :key="index" @click="_addQuery(item.first)">
+            <li
+              class="item"
+              v-for="(item, index) in hotKey"
+              :key="index"
+              @click="_addQuery(item.first)"
+            >
               <span>{{ item.first }}</span>
             </li>
           </ul>
@@ -16,8 +21,9 @@
       </div>
     </div>
     <div class="search-result" v-show="query">
-      <suggest :query="query"></suggest>
+      <suggest :query="query" @_listScroll="_blurInput"></suggest>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 <script>
@@ -48,6 +54,9 @@ export default {
     },
     _onQueryChange (query) {
       this.query = query
+    },
+    _blurInput () {
+      this.$refs.searchBox._blur()
     }
   },
   created () {

@@ -1,7 +1,19 @@
 <template>
-  <scroll class="suggest" :data="result" :pullUp="pullUp" @scrollToEnd="_searchMore">
+  <scroll
+    class="suggest"
+    :data="result"
+    :pullUp="pullUp"
+    @scrollToEnd="_searchMore"
+    :beforeScroll="beforeScroll"
+    @beforeScroll="_listScroll"
+  >
     <ul class="suggest-list">
-      <li class="suggest-item" v-for="(item, index) in result" :key="index">
+      <li
+        @click="_selectedItem(item)"
+        class="suggest-item"
+        v-for="(item, index) in result"
+        :key="index"
+      >
         <div class="icon">
           <i :class="_getIconCls(item)"></i>
         </div>
@@ -11,14 +23,19 @@
       </li>
       <loading v-show="hasMore" title></loading>
     </ul>
+    <div v-show="!hasMore && !result.length" class="no-result-wrapper">
+      <no-result title="抱歉，暂无搜索结果"></no-result>
+    </div>
   </scroll>
 </template>
 
 <script type="text/ecmascript-6">
 import { searchHotKey } from '@/api/search'
-import { createSearchSong } from '@/lib/utils'
+import { Singer, createSearchSong } from '@/lib/utils'
+import { mapActions, mapMutations } from 'vuex'
 import Scroll from '_c/scroll/scroll'
 import Loading from '_c/loading/loading'
+import NoResult from '_c/no-result/no-result'
 const LIMIT = 30
 export default {
   props: {
@@ -33,17 +50,21 @@ export default {
   },
   components: {
     Scroll,
-    Loading
+    Loading,
+    NoResult
   },
   data () {
     return {
       page: 1,
       result: [],
       pullUp: true,
-      hasMore: true
+      hasMore: true,
+      beforeScroll: true
     }
   },
   methods: {
+    ...mapActions(['insertSong']),
+    ...mapMutations(['SET_SINGER']),
     _search () {
       this.hasMore = true
       this.page = 1
@@ -84,6 +105,19 @@ export default {
     _checkMore ({ page, limit, songCount }) {
       const offset = (page - 1) * limit
       if (!songCount || offset >= songCount) this.hasMore = false
+    },
+    _selectedItem (item) {
+      console.log(item)
+      if (!item.singer) {
+        const singer = new Singer({ id: item.id, name: item.name, picUrl: item.img1v1Url })
+        this.SET_SINGER(singer)
+        this.$router.push({ path: `/search/${singer.id}` })
+      } else {
+        this.insertSong(item)
+      }
+    },
+    _listScroll () {
+      this.$emit('_listScroll')
     }
   },
   watch: {
