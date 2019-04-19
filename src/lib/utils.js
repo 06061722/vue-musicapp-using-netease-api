@@ -21,7 +21,7 @@ export class Song {
     return new Promise((resolve, reject) => {
       getLyric(this.id).then(res => {
         if (res.code === 200) {
-          this.lyric = res.lrc.lyric
+          this.lyric = res.lrc ? res.lrc.lyric : ''
           resolve(this.lyric)
         } else {
           reject(new Error('No lyric'))

@@ -49,7 +49,6 @@ export const formatTimeTwo = (raw) => {
 
 export const shuffle = (orderArr) => {
   let mixedArr = orderArr.map(song => {
-    console.log(Song.prototype)
     return new Song({ id: song.id, name: song.name, time: song.time, singer: song.singer, picUrl: song.picUrl })
   })
   function getRandomInt (min, max) {

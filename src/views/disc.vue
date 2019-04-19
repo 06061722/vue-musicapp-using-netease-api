@@ -32,7 +32,6 @@ export default {
       }
       getDiscDetail(this.disc.id).then(res => {
         this.songArr = this._normalizeSongs(res.playlist.tracks)
-        console.log(this.songArr)
       })
     },
     _normalizeSongs (list) {
