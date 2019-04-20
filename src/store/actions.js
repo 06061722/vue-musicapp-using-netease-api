@@ -1,5 +1,5 @@
 import { shuffle } from '@/lib/tools'
-import { saveSearch, deleteSearch, clearSearch } from '@/lib/utils'
+import { saveSearch, deleteSearch, clearSearch, savePlay } from '@/lib/utils'
 
 const actions = {
   selectPlay ({ commit, state }, { index, list }) {
@@ -86,6 +86,9 @@ const actions = {
     commit('SET_SEQUENCE_LIST', [])
     commit('SET_CURRENT_INDEX', -1)
     commit('SET_PLAYING_STATE', false)
+  },
+  savePlayHistory ({ commit }, song) {
+    commit('SET_PLAY_HISTORY', savePlay(song))
   }
 }
 

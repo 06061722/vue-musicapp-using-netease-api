@@ -79,14 +79,15 @@ export const createSearchSong = (searchList) => {
 
 const SEARCHHISTORY_MAX_LEN = 15
 const HISTORY_KEY = '__searchHistory__'
+function insertToArray (arr, val, compare, maxLen) {
+  const index = arr.findIndex(compare)
+  if (index === 0) return
+  if (index > 0) arr.splice(index, 1)
+  arr.unshift(val)
+  if (maxLen && arr.length > maxLen) arr.pop()
+}
+
 export const saveSearch = (query) => {
-  function insertToArray (arr, val, compare, maxLen) {
-    const index = arr.findIndex(compare)
-    if (index === 0) return
-    if (index > 0) arr.splice(index, 1)
-    arr.unshift(val)
-    if (maxLen && maxLen > SEARCHHISTORY_MAX_LEN) arr.pop()
-  }
   let searchHistoryArr = localStorage.getItem(HISTORY_KEY) === null ? [] : JSON.parse(localStorage.getItem(HISTORY_KEY))
   insertToArray(searchHistoryArr, query, item => item === query, SEARCHHISTORY_MAX_LEN)
   localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistoryArr))
@@ -107,4 +108,14 @@ export const deleteSearch = (query) => {
 export const clearSearch = () => {
   localStorage.removeItem(HISTORY_KEY)
   return []
+}
+
+const PLAY_KEY = '__playhistory__'
+const PLAYHISTORY_MAX_LEN = 100
+
+export function savePlay (song) {
+  let playHistoryArr = localStorage.getItem(PLAY_KEY) === null ? [] : JSON.parse(localStorage.getItem(PLAY_KEY))
+  insertToArray(playHistoryArr, song, item => item.id === song.id, PLAYHISTORY_MAX_LEN)
+  localStorage.setItem(PLAY_KEY, JSON.stringify(playHistoryArr))
+  return playHistoryArr
 }

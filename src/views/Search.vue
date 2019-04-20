@@ -50,9 +50,9 @@ import Confirm from '_c/confirm/confirm'
 import Scroll from '_c/scroll/scroll'
 import { getHotKey } from '@/api/search'
 import { mapState, mapActions } from 'vuex'
-import { playListMixin } from '@/lib/mixin'
+import { playListMixin, searchMixin } from '@/lib/mixin'
 export default {
-  mixins: [playListMixin],
+  mixins: [playListMixin, searchMixin],
   components: {
     SearchBox,
     Suggest,
@@ -62,8 +62,7 @@ export default {
   },
   data () {
     return {
-      hotKey: [],
-      query: ''
+      hotKey: []
     }
   },
   computed: {
@@ -87,15 +86,6 @@ export default {
           this.hotKey = res.result.hots
         }
       })
-    },
-    _addQuery (query) {
-      this.$refs.searchBox._setQuery(query)
-    },
-    _onQueryChange (query) {
-      this.query = query
-    },
-    _blurInput () {
-      this.$refs.searchBox._blur()
     },
     _showConfirm () {
       this.$refs.confirm._show()

@@ -110,7 +110,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 import { prefixStyle, formatTimeOne, formatTimeTwo } from '@/lib/tools'
 import { getSongUrl } from '@/api/singerandsong'
 import { playerMixin } from '@/lib/mixin'
@@ -171,6 +171,7 @@ export default {
     formatTimeOne,
     formatTimeTwo,
     ...mapMutations(['SET_FULL_SCREEN', 'SET_PLAYLIST', 'SET_CURRENT_INDEX', 'SET_PLAYING_STATE']),
+    ...mapActions(['savePlayHistory']),
     _back () {
       this.SET_FULL_SCREEN(false)
     },
@@ -256,6 +257,7 @@ export default {
     },
     _onReady () {
       this.songIsReady = true
+      this.savePlayHistory(this.currentSong)
     },
     _onError () {
       this.songIsReady = true

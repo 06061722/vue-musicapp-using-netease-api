@@ -45,3 +45,22 @@ export const playerMixin = {
     }
   }
 }
+
+export const searchMixin = {
+  data () {
+    return {
+      query: ''
+    }
+  },
+  methods: {
+    _addQuery (query) {
+      this.$refs.searchBox._setQuery(query)
+    },
+    _onQueryChange (query) {
+      this.query = query
+    },
+    _blurInput () {
+      this.$refs.searchBox._blur()
+    }
+  }
+}

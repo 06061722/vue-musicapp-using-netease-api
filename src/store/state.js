@@ -1,4 +1,5 @@
-const KEY = '__searchHistory__'
+const SEARCH = '__searchHistory__'
+const PLAY = '__playHistory__'
 const state = {
   singer: {},
   playing: false,
@@ -9,7 +10,8 @@ const state = {
   currentIndex: -1,
   disc: {},
   topList: {},
-  searchHistory: (() => localStorage.getItem(KEY) === null ? [] : JSON.parse(localStorage.getItem(KEY)))()
+  searchHistory: (() => localStorage.getItem(SEARCH) === null ? [] : JSON.parse(localStorage.getItem(SEARCH)))(),
+  playHistory: (() => localStorage.getItem(PLAY) === null ? [] : JSON.parse(localStorage.getItem(PLAY)))()
 }
 
 export default state
