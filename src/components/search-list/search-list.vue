@@ -1,5 +1,5 @@
 <template>
-  <div class="search-list" v-show="searches.length">
+  <div class="search-list">
     <ul>
       <li class="search-item" v-for="(item, index) in searches" :key="index" @click="_selectItem(item)">
         <span class="text">{{item}}</span>

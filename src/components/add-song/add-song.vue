@@ -8,14 +8,33 @@
         </div>
       </div>
       <div class="search-box-wrapper">
-        <search-box placeholder="搜索歌曲" @query="_onQueryChange"></search-box>
+        <search-box placeholder="搜索歌曲" @query="_onQueryChange" ref="searchBox"></search-box>
       </div>
       <div class="shortcut" v-show="!query">
         <switches :switches="switches" @switched="_switched" :currentIndex="currentIndex"></switches>
         <div class="list-wrapper">
-          <scroll class="list-scroll" v-if="currentIndex === 0" :data="playHistory">
+          <scroll
+            class="list-scroll"
+            ref="songList"
+            v-show="currentIndex === 0"
+            :data="playHistory"
+          >
             <div class="list-inner">
-              <song-list :songArr="playHistory"></song-list>
+              <song-list :songArr="playHistory" @selectedSong="_selectedSong"></song-list>
+            </div>
+          </scroll>
+          <scroll
+            class="list-scroll"
+            ref="searchList"
+            v-show="currentIndex === 1"
+            :data="searchHistory"
+          >
+            <div class="list-inner">
+              <search-list
+                @deleted="deleteSearchHistory"
+                @selected="_addQuery"
+                :searches="searchHistory"
+              ></search-list>
             </div>
           </scroll>
         </div>
@@ -28,6 +47,12 @@
           @listScroll="_blurInput"
         ></suggest>
       </div>
+      <top-tip ref="topTip">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">1首歌曲已经添加到播放队列</span>
+        </div>
+      </top-tip>
     </div>
   </transition>
 </template>
@@ -38,8 +63,11 @@ import Suggest from '_c/suggest/suggest'
 import Switches from '_c/switches/switches'
 import Scroll from '_c/scroll/scroll'
 import SongList from '_c/song-list/song-list'
+import SearchList from '_c/search-list/search-list'
+import TopTip from '_c/top-tip/top-tip'
 import { mapState, mapActions } from 'vuex'
 import { searchMixin } from '@/lib/mixin'
+import { Song } from '@/lib/utils'
 export default {
   mixins: [searchMixin],
   components: {
@@ -47,7 +75,9 @@ export default {
     Suggest,
     Switches,
     Scroll,
-    SongList
+    SongList,
+    SearchList,
+    TopTip
   },
   data () {
     return {
@@ -61,21 +91,39 @@ export default {
     }
   },
   computed: {
-    ...mapState(['playHistory'])
+    ...mapState(['playHistory', 'searchHistory'])
   },
   methods: {
-    ...mapActions(['saveSearchHistory', 'deleteSearchHistory', 'clearSeachHistory']),
+    ...mapActions(['saveSearchHistory', 'deleteSearchHistory', 'clearSeachHistory', 'insertSong']),
     _show () {
       this.showFlag = true
+      this.$nextTick(() => {
+        if (this.currentIndex === 0) this.$refs.songList._refresh()
+        else this.$refs.searchList._refresh()
+      })
     },
     _hide () {
       this.showFlag = false
     },
     _switched (index) {
       this.currentIndex = index
+      this.$nextTick(() => {
+        if (index === 0) this.$refs.songList._refresh()
+        else this.$refs.searchList._refresh()
+      })
+    },
+    _selectedSong (song, index) {
+      if (index !== 0) {
+        this.insertSong(new Song({ id: song.id, name: song.name, time: song.time, singer: song.singer, picUrl: song.picUrl }))
+        this._showTip()
+      }
+    },
+    _showTip () {
+      this.$refs.topTip._show()
     }
   }
 }
+
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
