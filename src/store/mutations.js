@@ -9,7 +9,8 @@ const mutations = {
   SET_DISC (state, disc) { state.disc = disc },
   SET_TOP_LIST (state, list) { state.topList = list },
   SET_SEARCH_HISTORY (state, history) { state.searchHistory = history },
-  SET_PLAY_HISTORY (state, history) { state.playHistory = history }
+  SET_PLAY_HISTORY (state, history) { state.playHistory = history },
+  SET_FAVORITE_LIST (state, list) { state.favoriteList = list }
 }
 
 export default mutations

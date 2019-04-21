@@ -93,13 +93,13 @@ export const saveSearch = (query) => {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistoryArr))
   return searchHistoryArr
 }
+function deleteFromArray (arr, compare) {
+  const index = arr.findIndex(compare)
+  if (index > -1) arr.splice(index, 1)
+}
 
 export const deleteSearch = (query) => {
   let searchHistoryArr = JSON.parse(localStorage.getItem(HISTORY_KEY))
-  function deleteFromArray (arr, compare) {
-    const index = arr.findIndex(compare)
-    if (index > -1) arr.splice(index, 1)
-  }
   deleteFromArray(searchHistoryArr, item => item === query)
   localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistoryArr))
   return searchHistoryArr
@@ -110,7 +110,7 @@ export const clearSearch = () => {
   return []
 }
 
-const PLAY_KEY = '__playhistory__'
+const PLAY_KEY = '__playHistory__'
 const PLAYHISTORY_MAX_LEN = 100
 
 export function savePlay (song) {
@@ -118,4 +118,21 @@ export function savePlay (song) {
   insertToArray(playHistoryArr, song, item => item.id === song.id, PLAYHISTORY_MAX_LEN)
   localStorage.setItem(PLAY_KEY, JSON.stringify(playHistoryArr))
   return playHistoryArr
+}
+
+const FAVORITE_KEY = '__favorite__'
+const FAVORITE_MAX_LEN = 100
+
+export function saveFavorite (song) {
+  let favoriteArr = localStorage.getItem(FAVORITE_KEY) === null ? [] : JSON.parse(localStorage.getItem(FAVORITE_KEY))
+  insertToArray(favoriteArr, song, item => item.id === song.id, FAVORITE_MAX_LEN)
+  localStorage.setItem(FAVORITE_KEY, JSON.stringify(favoriteArr))
+  return favoriteArr
+}
+
+export function deleteFavorite (song) {
+  let favoriteArr = localStorage.getItem(FAVORITE_KEY) === null ? [] : JSON.parse(localStorage.getItem(FAVORITE_KEY))
+  deleteFromArray(favoriteArr, item => item.id === song.id)
+  localStorage.setItem(FAVORITE_KEY, JSON.stringify(favoriteArr))
+  return favoriteArr
 }

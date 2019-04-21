@@ -1,5 +1,6 @@
 const SEARCH = '__searchHistory__'
 const PLAY = '__playHistory__'
+const FAVORITE = '__favorite__'
 const state = {
   singer: {},
   playing: false,
@@ -11,7 +12,8 @@ const state = {
   disc: {},
   topList: {},
   searchHistory: (() => localStorage.getItem(SEARCH) === null ? [] : JSON.parse(localStorage.getItem(SEARCH)))(),
-  playHistory: (() => localStorage.getItem(PLAY) === null ? [] : JSON.parse(localStorage.getItem(PLAY)))()
+  playHistory: (() => localStorage.getItem(PLAY) === null ? [] : JSON.parse(localStorage.getItem(PLAY)))(),
+  favoriteList: (() => localStorage.getItem(FAVORITE) === null ? [] : JSON.parse(localStorage.getItem(FAVORITE)))()
 }
 
 export default state

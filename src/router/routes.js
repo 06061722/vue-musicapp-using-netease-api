@@ -50,5 +50,10 @@ export default [
         component: () => import('@/views/Singer_Detail.vue')
       }
     ]
+  },
+  {
+    path: '/user',
+    name: 'user',
+    component: () => import('@/views/User_Center.vue')
   }
 ]
