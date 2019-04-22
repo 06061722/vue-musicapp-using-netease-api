@@ -31,11 +31,6 @@ export const playerMixin = {
     }),
     iconMode () { // 0: sequence, 1: loop, 2: random
       return this.mode === 0 ? 'icon-sequence' : this.mode === 1 ? 'icon-loop' : 'icon-random'
-    },
-    getFavoriteIcon () {
-      return this.favoriteList.findIndex(item => item.id === this.currentSong.id) !== -1
-        ? 'icon-favorite'
-        : 'icon-not-favorite'
     }
   },
   methods: {
@@ -54,6 +49,9 @@ export const playerMixin = {
     toggleFavorite (song) {
       if (this.favoriteList.findIndex(item => item.id === song.id) !== -1) this.deleteFavoriteList(song)
       else this.saveFavoriteList(song)
+    },
+    getFavoriteIcon (song) {
+      return this.favoriteList.findIndex(item => item.id === song.id)
     }
   }
 }

@@ -22,8 +22,8 @@
             >
               <i class="current" :class="_getCurrentIcon(item)"></i>
               <span class="text">{{ item.name }}</span>
-              <span class="like" @click.stop="toggleFavorite(currentSong)">
-                <i :class="getFavoriteIcon"></i>
+              <span class="like" @click.stop="toggleFavorite(item)">
+                <i :class="getFavoriteIcon(item) !== -1 ? 'icon-favorite' : 'icon-not-favorite'"></i>
               </span>
               <span class="delete" @click.stop="_deleteOne(item)">
                 <i class="icon-delete"></i>

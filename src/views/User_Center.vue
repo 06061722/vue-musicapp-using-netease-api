@@ -28,7 +28,9 @@
           </div>
         </scroll>
       </div>
-      <div class="no-result-wrapper"></div>
+      <div class="no-result-wrapper" v-show="noResult">
+        <no-result :title="noResultDesc"></no-result>
+      </div>
     </div>
   </transition>
 </template>
@@ -37,13 +39,17 @@
 import Switches from '_c/switches/switches'
 import Scroll from '_c/scroll/scroll'
 import SongList from '_c/song-list/song-list'
+import NoResult from '_c/no-result/no-result'
 import { mapState, mapActions } from 'vuex'
 import { Song } from '@/lib/utils'
+import { playListMixin } from '@/lib/mixin'
 export default {
+  mixins: [playListMixin],
   components: {
     Switches,
     Scroll,
-    SongList
+    SongList,
+    NoResult
   },
   data () {
     return {
@@ -55,9 +61,23 @@ export default {
     }
   },
   computed: {
-    ...mapState(['favoriteList', 'playHistory'])
+    ...mapState(['favoriteList', 'playHistory']),
+    noResult () {
+      if (this.currentIndex === 0) return !this.favoriteList.length
+      else return !this.playHistory.length
+    },
+    noResultDesc () {
+      if (this.currentIndex === 0) return '暂无收藏歌曲'
+      else return '你还没有听过歌曲'
+    }
   },
   methods: {
+    handlePlayList (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.listWrapper.style.bottom = bottom
+      this.$refs.favoriteList && this.$refs.favoriteList._refresh()
+      this.$refs.playList && this.$refs.playList._refresh()
+    },
     ...mapActions(['insertSong', 'randomPlay']),
     _switched (index) {
       this.currentIndex = index
@@ -70,6 +90,7 @@ export default {
     },
     _random () {
       let list = this.currentIndex === 0 ? this.favoriteList : this.playHistory
+      if (list.length === 0) return
       list.map(item => new Song({ id: item.id, name: item.name, time: item.time, singer: item.singer, picUrl: item.picUrl }))
       this.randomPlay({ list })
     }

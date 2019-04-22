@@ -1,29 +1,8 @@
-# vue-music
+# A simple H5 Music App
 
-## Project setup
-```
-npm install
-```
+> using NeteaseCloudMusicApi built by Vue
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+还存在着一点小BUG，如某些图片api调用不到，和同时使用两个better-scroll组件，右边组件不能滑动。
 
-### Compiles and minifies for production
-```
-npm run build
-```
+感谢[Binaryify](https://github.com/Binaryify)提供的[网易云音乐API](https://github.com/Binaryify/NeteaseCloudMusicApi)
 
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
